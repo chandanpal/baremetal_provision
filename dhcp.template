@@ -1,0 +1,124 @@
+# ******************************************************************
+# Cobbler managed dhcpd.conf file
+#
+# generated from cobbler dhcp.conf template ($date)
+# Do NOT make changes to /etc/dhcpd.conf. Instead, make your changes
+# in /etc/cobbler/dhcp.template, as /etc/dhcpd.conf will be
+# overwritten.
+#
+# ******************************************************************
+
+ddns-update-style interim;
+
+allow booting;
+allow bootp;
+
+ignore client-updates;
+set vendorclass = option vendor-class-identifier;
+
+option pxe-system-type code 93 = unsigned integer 16;
+
+host pnda-mgr-01 { hardware ethernet 00:25:B5:DD:00:7F; }
+host pnda-mgr-02 { hardware ethernet 00:25:B5:DD:00:4F; }
+host pnda-mgr-03 { hardware ethernet 00:25:B5:DD:00:5F; }
+host pnda-mgr-04 { hardware ethernet 00:25:B5:DD:00:2F; }
+host pnda-DN-0 { hardware ethernet 00:25:B5:DD:01:EF; }
+host pnda-DN-1 { hardware ethernet 00:25:B5:DD:01:BF; }
+host pnda-DN-2 { hardware ethernet 00:25:B5:DD:01:CF; }
+host pnda-DN-3 { hardware ethernet 00:25:B5:DD:01:AF; }
+host pnda-zk-0 { hardware ethernet 00:25:B5:DD:00:3F; }
+host pnda-zk-1 { hardware ethernet 00:25:B5:DD:00:0F; }
+host pnda-zk-2 { hardware ethernet 00:25:B5:DD:00:1F; }
+host pnda-kafka-0 { hardware ethernet 00:25:B5:DD:00:8F; }
+host pnda-kafka-1 { hardware ethernet 00:25:B5:DD:00:9F; }
+host pnda-kafka-2 { hardware ethernet 00:25:B5:DD:00:6F; }
+host pnda-otsdb-0 { hardware ethernet 00:25:B5:DD:01:FF; }
+host pnda-otsdb-1 { hardware ethernet 00:25:B5:DD:01:DF; }
+host pnda-tools { hardware ethernet 00:25:B5:DD:01:9F; }
+host pnda-build { hardware ethernet 00:25:B5:DD:01:5F; }
+host pnda-edge { hardware ethernet 00:25:B5:DD:01:4F; }
+host hadoop-mgr { hardware ethernet 00:25:B5:DD:01:8F; }
+
+
+subnet 9.0.8.0 netmask 255.255.255.0 {
+     #option routers             192.168.1.5;
+     #option domain-name-servers 192.168.1.1;
+     option subnet-mask         255.255.255.0;
+     #range dynamic-bootp        9.0.8.130 9.0.8.151;
+     default-lease-time         21600;
+     #max-lease-time             43200;
+     next-server                $next_server;
+    
+     #host pnda-mgr-01 { hardware ethernet 00:25:b5:DD:01:7F; }
+     # host myhost2 { hardware ethernet 0:c0:c3:88:2d:82; }
+     pool {
+           max-lease-time 28800;
+           range 9.0.8.130 9.0.8.151;
+           deny unknown-clients;
+     }
+
+
+     class "pxeclients" {
+          match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
+          if option pxe-system-type = 00:02 {
+                  filename "ia64/elilo.efi";
+          } else if option pxe-system-type = 00:06 {
+                  filename "grub/grub-x86.efi";
+          } else if option pxe-system-type = 00:07 {
+                  filename "grub/grub-x86_64.efi";
+          } else if option pxe-system-type = 00:09 {
+                  filename "grub/grub-x86_64.efi";
+          } else {
+                  filename "pxelinux.0";
+          }
+     }
+
+}
+
+#for dhcp_tag in $dhcp_tags.keys():
+    ## group could be subnet if your dhcp tags line up with your subnets
+    ## or really any valid dhcpd.conf construct ... if you only use the
+    ## default dhcp tag in cobbler, the group block can be deleted for a
+    ## flat configuration
+# group for Cobbler DHCP tag: $dhcp_tag
+group {
+        #for mac in $dhcp_tags[$dhcp_tag].keys():
+            #set iface = $dhcp_tags[$dhcp_tag][$mac]
+    host $iface.name {
+        #if $iface.interface_type == "infiniband":
+        option dhcp-client-identifier = $mac;
+        #else
+        hardware ethernet $mac;
+        #end if
+        #if $iface.ip_address:
+        fixed-address $iface.ip_address;
+        #end if
+        #if $iface.hostname:
+        option host-name "$iface.hostname";
+        #end if
+        #if $iface.netmask:
+        option subnet-mask $iface.netmask;
+        #end if
+        #if $iface.gateway:
+        option routers $iface.gateway;
+        #end if
+        #if $iface.enable_gpxe:
+        if exists user-class and option user-class = "gPXE" {
+            filename "http://$cobbler_server/cblr/svc/op/gpxe/system/$iface.owner";
+        } else if exists user-class and option user-class = "iPXE" {
+            filename "http://$cobbler_server/cblr/svc/op/gpxe/system/$iface.owner";
+        } else {
+            filename "undionly.kpxe";
+        }
+        #else
+        filename "$iface.filename";
+        #end if
+        ## Cobbler defaults to $next_server, but some users
+        ## may like to use $iface.system.server for proxied setups
+        next-server $next_server;
+        ## next-server $iface.next_server;
+    }
+        #end for
+}
+#end for
+

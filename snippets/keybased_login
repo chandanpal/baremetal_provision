@@ -1,0 +1,12 @@
+mkdir -m 0700 /root/.ssh/
+
+
+cat <<EOF >/root/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtLjvyNp1B34cwV5Hwhr2W3xikxDELBLdYDtYa77ZNjtR2W0nrj9JxGG6RbHrPjCpn39VVB7IYdMceti95hl3/WcZQwX00Uxy640iBqRnX71dAYZ54VGn22QsBeGc+hVr/3+IHwS0tCKOdI6inIzBArWlZha9WAt9kJA3TDy+uOCVOc2DdhEA+kRlXzsm/OsMkPNWX6E2hx3Ry1/DbxUlyVAQi1y+bwm+4QVY0cVeTQC+Fe5Rfy7ESR0TznElesoNUHYgmMec6hbjLOHm3ZGAtdxhccPpnrcqA/1N56SyOjJDG9xW/aVOTNpaQd4b/unNpfEHK93uychQS5LL3v0Vx root@cobbler
+EOF
+
+### set permissions
+chmod 0600 /root/.ssh/authorized_keys
+
+### fix up selinux context
+#restorecon -R /root/.ssh/
