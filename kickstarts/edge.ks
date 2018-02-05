@@ -42,28 +42,11 @@ install
 zerombr
 # Allow anaconda to partition the system as needed
 # autopart
-
-
-$SNIPPET('find_drive_name')
-
-FIND_DRIVE 50 65
-BOOTDRIVE=$DRIVENAME
-echo "BOOTDRIVE NAME: " $BOOTDRIVE
-part /boot --fstype xfs --size 1024 --ondisk=$BOOTDRIVE
-part /home --fstype xfs --size 10240 --ondisk=$BOOTDRIVE
-part / --fstype xfs --grow --ondisk=$BOOTDRIVE
-
-FIND_DRIVE 1100 1300
-DATADRIVE=$DRIVENAME
-echo "DATADRIVE NAME: " $DATADRIVE
-part /opt --fstype xfs --size 256000 --ondisk=$DATADRIVE
-part /var --fstype xfs --size 256000 --ondisk=$DATADRIVE
-
-#part /boot --fstype xfs --size 1024 --ondisk=sdb
-#part /home --fstype xfs --size 10240 --ondisk=sdb
-#part / --fstype xfs --grow --ondisk=sdb
-#part /opt --fstype xfs --size 256000 --ondisk=sda
-#part /var --fstype xfs --size 256000 --ondisk=sda
+part /boot --fstype xfs --size 1024 --ondisk=sdb
+part /home --fstype xfs --size 10240 --ondisk=sdb
+part / --fstype xfs --grow --ondisk=sdb
+part /opt --fstype xfs --size 512000 --ondisk=sda
+part /var --fstype xfs --size 512000 --ondisk=sda
 
 %pre
 $SNIPPET('log_ks_pre')

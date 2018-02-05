@@ -43,9 +43,9 @@ install
 zerombr
 # Allow anaconda to partition the system as needed
 # autopart
-part biosboot --fstype biosboot --size 1
-part /boot --fstype xfs --size 1008
-part / --fstype xfs --size 256000
+part /boot --fstype xfs --size 1024 --ondisk=sdi
+part /home --fstype xfs --size 10240 --ondisk=sdi
+part / --fstype xfs --grow --ondisk=sdi
 
 
 %pre
@@ -58,6 +58,9 @@ $SNIPPET('pre_anamon')
 
 %packages
 $SNIPPET('func_install_if_enabled')
+yum-utils
+createrepo
+nmap-ncat
 %end
 
 %post --nochroot

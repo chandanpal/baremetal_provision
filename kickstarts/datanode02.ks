@@ -32,6 +32,7 @@ rootpw cisco.123
 # SELinux configuration
 #selinux --disabled
 selinux --permissive
+
 # Do not configure the X Window System
 skipx
 # System timezone
@@ -42,28 +43,10 @@ install
 zerombr
 # Allow anaconda to partition the system as needed
 # autopart
+part /boot --fstype xfs --size 1024 --ondisk=sdac
+part /home --fstype xfs --size 10240 --ondisk=sdac
+part / --fstype xfs --grow --ondisk=sdac
 
-
-$SNIPPET('find_drive_name')
-
-FIND_DRIVE 50 65
-BOOTDRIVE=$DRIVENAME
-echo "BOOTDRIVE NAME: " $BOOTDRIVE
-part /boot --fstype xfs --size 1024 --ondisk=$BOOTDRIVE
-part /home --fstype xfs --size 10240 --ondisk=$BOOTDRIVE
-part / --fstype xfs --grow --ondisk=$BOOTDRIVE
-
-FIND_DRIVE 1100 1300
-DATADRIVE=$DRIVENAME
-echo "DATADRIVE NAME: " $DATADRIVE
-part /opt --fstype xfs --size 256000 --ondisk=$DATADRIVE
-part /var --fstype xfs --size 256000 --ondisk=$DATADRIVE
-
-#part /boot --fstype xfs --size 1024 --ondisk=sdb
-#part /home --fstype xfs --size 10240 --ondisk=sdb
-#part / --fstype xfs --grow --ondisk=sdb
-#part /opt --fstype xfs --size 256000 --ondisk=sda
-#part /var --fstype xfs --size 256000 --ondisk=sda
 
 %pre
 $SNIPPET('log_ks_pre')
@@ -97,6 +80,7 @@ $SNIPPET('func_register_if_enabled')
 $SNIPPET('download_config_files')
 $SNIPPET('koan_environment')
 $SNIPPET('redhat_register')
+
 #subscription-manager register --username=XXXXXXXXXXXXX --password=XXXXXXXXXXX --auto-attach
 #yum -y install yum-utils
 #subscription-manager repos --enable rhel-7-server-optional-rpms
