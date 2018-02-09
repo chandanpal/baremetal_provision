@@ -11,7 +11,7 @@ clearpart --all --initlabel
 # Use text mode install
 text
 # Firewall configuration
-firewall --enabled
+firewall --disabled
 # Run the Setup Agent on first boot
 firstboot --disable
 # System keyboard
@@ -35,35 +35,19 @@ selinux --permissive
 # Do not configure the X Window System
 skipx
 # System timezone
-timezone  America/New_York
+#timezone  America/New_York
+timezone UTC
 # Install OS instead of upgrade
 install
 # Clear the Master Boot Record
 zerombr
 # Allow anaconda to partition the system as needed
 # autopart
-
-
-$SNIPPET('find_drive_name')
-
-FIND_DRIVE 50 65
-BOOTDRIVE=$DRIVENAME
-echo "BOOTDRIVE NAME: " $BOOTDRIVE
-part /boot --fstype xfs --size 1024 --ondisk=$BOOTDRIVE
-part /home --fstype xfs --size 10240 --ondisk=$BOOTDRIVE
-part / --fstype xfs --grow --ondisk=$BOOTDRIVE
-
-FIND_DRIVE 1100 1300
-DATADRIVE=$DRIVENAME
-echo "DATADRIVE NAME: " $DATADRIVE
-part /opt --fstype xfs --size 256000 --ondisk=$DATADRIVE
-part /var --fstype xfs --size 256000 --ondisk=$DATADRIVE
-
-#part /boot --fstype xfs --size 1024 --ondisk=sdb
-#part /home --fstype xfs --size 10240 --ondisk=sdb
-#part / --fstype xfs --grow --ondisk=sdb
-#part /opt --fstype xfs --size 256000 --ondisk=sda
-#part /var --fstype xfs --size 256000 --ondisk=sda
+part /boot --fstype xfs --size 1024 --ondisk=sdb
+part /home --fstype xfs --size 10240 --ondisk=sdb
+part / --fstype xfs --grow --ondisk=sdb
+part /opt --fstype xfs --size 256000 --ondisk=sda
+part /var --fstype xfs --size 256000 --ondisk=sda
 
 %pre
 $SNIPPET('log_ks_pre')
@@ -78,6 +62,13 @@ $SNIPPET('func_install_if_enabled')
 yum-utils
 createrepo
 nmap-ncat
+tcpdump
+pciutils
+traceroute
+net-tools
+realmd
+sssd
+libaio
 %end
 
 %post --nochroot
@@ -93,6 +84,7 @@ $SNIPPET('post_install_kernel_options')
 $SNIPPET('post_install_network_config')
 rm -f /etc/sysconfig/network-scripts/ifcfg-$IFNAME
 chkconfig NetworkManager off
+systemctl restart network
 $SNIPPET('func_register_if_enabled')
 $SNIPPET('download_config_files')
 $SNIPPET('koan_environment')

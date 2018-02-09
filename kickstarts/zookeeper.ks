@@ -11,7 +11,7 @@ clearpart --all --initlabel
 # Use text mode install
 text
 # Firewall configuration
-firewall --enabled
+firewall --disabled
 # Run the Setup Agent on first boot
 firstboot --disable
 # System keyboard
@@ -36,7 +36,7 @@ selinux --permissive
 # Do not configure the X Window System
 skipx
 # System timezone
-timezone  America/New_York
+timezone UTC
 # Install OS instead of upgrade
 install
 # Clear the Master Boot Record
@@ -48,6 +48,12 @@ part /home --fstype xfs --size 10240 --ondisk=sdb
 part / --fstype xfs --grow --ondisk=sdb
 part /opt --fstype xfs --size 256000 --ondisk=sda
 part /var --fstype xfs --size 256000 --ondisk=sda
+#part /boot --fstype xfs --size 1024
+#part /home --fstype xfs --size 10240
+#part / --fstype xfs --grow
+#part /opt --fstype xfs --size 256000
+#part /var --fstype xfs --size 256000
+
 
 %pre
 $SNIPPET('log_ks_pre')
@@ -62,6 +68,13 @@ $SNIPPET('func_install_if_enabled')
 yum-utils
 createrepo
 nmap-ncat
+tcpdump
+pciutils
+traceroute
+net-tools
+realmd
+sssd
+libaio
 %end
 
 %post --nochroot
@@ -77,6 +90,7 @@ $SNIPPET('post_install_kernel_options')
 $SNIPPET('post_install_network_config')
 rm -f /etc/sysconfig/network-scripts/ifcfg-$IFNAME
 chkconfig NetworkManager off
+systemctl restart network
 $SNIPPET('func_register_if_enabled')
 $SNIPPET('download_config_files')
 $SNIPPET('koan_environment')

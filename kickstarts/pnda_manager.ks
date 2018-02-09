@@ -11,7 +11,7 @@ clearpart --all --initlabel
 # Use text mode install
 text
 # Firewall configuration
-firewall --enabled
+firewall --disabled
 # Run the Setup Agent on first boot
 firstboot --disable
 # System keyboard
@@ -34,7 +34,7 @@ selinux --permissive
 # Do not configure the X Window System
 skipx
 # System timezone
-timezone  America/New_York
+timezone UTC
 # Install OS instead of upgrade
 install
 # Clear the Master Boot Record
@@ -60,6 +60,13 @@ $SNIPPET('func_install_if_enabled')
 yum-utils
 createrepo
 nmap-ncat
+tcpdump
+pciutils
+traceroute
+net-tools
+realmd
+sssd
+libaio
 %end
 
 %post --nochroot
